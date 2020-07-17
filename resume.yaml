@@ -1,0 +1,135 @@
+introduction:
+  Web やスマートフォンアプリの開発をしてまいりました。
+  サービスの企画から開発、運営まで、幅広い経験がございます。
+experiences:
+  - title: ホームページ制作業務
+    since: 2013-01-01T10:00:00+09:00
+    until: 2013-12-31T18:59:59+09:00
+    style: アルバイト
+    positions: [プログラマ]
+    scale: 5
+    skills:
+      - CSS
+      - HTML
+      - JavaScript
+      - Photoshop
+      - Windows
+    text: |-
+      ホームページ制作業務で主にコーディングを担当。
+
+      【携わった開発⼯程】
+      実装、テスト
+  - title: EC サイト開発
+    since: 2014-01-01T10:00:00+09:00
+    until: 2014-12-31T18:59:59+09:00
+    style: アルバイト
+    positions: [プログラマ]
+    scale: 5
+    skills:
+      - Linux
+      - MySQL
+      - PHP
+      - Subversion
+      - Windows
+    text: |-
+      自社で運用する EC サイトの開発を担当。
+
+      【携わった開発⼯程】
+      基本設計、詳細設計、実装、テスト、保守・運用
+  - title: スマートフォンアプリ開発
+    since: 2015-01-01T10:00:00+09:00
+    until: 2015-12-31T18:59:59+09:00
+    style: 正社員
+    positions: [プログラマ]
+    scale: 20
+    skills:
+      - Android
+      - Git
+      - Java
+      - Linux
+      - macOS
+      - PostgreSQL
+    text: |-
+      自社で運用するアプリの開発と一般公開、システム運用を担当。
+
+      【携わった開発⼯程】
+      基本設計、詳細設計、実装、テスト、保守・運用
+  - title: スマートフォン向けパズルゲーム開発
+    since: 2016-01-01T10:00:00+09:00
+    until: 2016-12-31T18:59:59+09:00
+    style: 正社員
+    positions: [プログラマ, マネージャ]
+    scale: 50
+    skills:
+      - Git
+      - Google App Engine
+      - Swift
+      - Java
+      - Linux
+      - macOS
+      - Spring Framework
+    text: |-
+      自社で運用するゲームアプリの開発と一般公開、システム運用を担当。
+
+      【携わった開発⼯程】
+      要件定義、基本設計、詳細設計、実装、テスト、保守・運用
+  - title: スマートフォン向け対戦アクションゲーム開発
+    since: 2017-01-01T10:00:00+09:00
+    until: 2017-12-31T18:59:59+09:00
+    style: 正社員
+    positions: [プログラマ, マネージャ]
+    scale: 100
+    skills:
+      - Git
+      - Google App Engine
+      - Swift
+      - Java
+      - Linux
+      - macOS
+      - Spring Framework
+    text: |-
+      自社で運用するゲームアプリの開発と一般公開、システム運用を担当。
+
+      【携わった開発⼯程】
+      要件定義、基本設計、詳細設計、実装、テスト、保守・運用
+  - title: チケット予約システム開発
+    since: 2018-01-01T10:00:00+09:00
+    until: 2018-12-31T18:59:59+09:00
+    style: 業務委託
+    positions: [プログラマ]
+    scale: 10
+    skills:
+      - AWS
+      - Express
+      - Git
+      - JavaScript
+      - Linux
+      - macOS
+      - MySQL
+      - Node.js
+      - Vue.js
+    text: |-
+      チケット予約システムの開発を担当。
+
+      【携わった開発⼯程】
+      詳細設計、実装、テスト、保守・運用
+  - title: 商業施設向け IoT プロダクト開発
+    since: 2019-01-01T10:00:00+09:00
+    until: 2019-12-31T18:59:59+09:00
+    style: 業務委託
+    positions: [プログラマ]
+    scale: 10
+    skills:
+      - AWS
+      - Git
+      - JavaScript
+      - Linux
+      - macOS
+      - Azure IoT
+      - Python
+      - Raspberry Pi
+    text: |-
+      商業施設向け IoT プロダクトの開発を担当。
+
+      【携わった開発⼯程】
+      要件定義、基本設計、詳細設計、実装、テスト、保守・運用

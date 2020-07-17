@@ -1,0 +1,244 @@
+<html>
+<head>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-yaml@3.14.0/dist/js-yaml.min.js"></script>
+<style>
+* {
+  font-family: "SF Pro JP", "SF Pro Text", "Apple TP", "Myriad Set Pro", system-ui, -apple-system, BlinkMacSystemFont,
+               "Segoe UI", "SF Pro Icons", "Apple Legacy Icons", "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3",
+               メイリオ, Meiryo, "ＭＳ Ｐゴシック", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+nav {
+  width: 40em;
+}
+nav input[type="file"] {
+  display: block;
+  margin-bottom: .25em;
+}
+nav input[type="text"] {
+  width: 32em;
+}
+main {
+  width: 210mm;
+  padding: 2em;
+}
+main * {
+  font-size: 2mm;
+}
+section {
+  margin: 2em 0 3em 0;
+}
+table {
+  width: 100%;
+  page-break-inside: avoid;
+}
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+h1 {
+  text-align: center;
+  letter-spacing: .25em;
+  font-size: 6mm;
+}
+h1 * {
+  font-size: 100%;
+}
+h2 {
+  padding-bottom: .25em;
+  border-bottom: 1px solid #333;
+  font-size: 4mm;
+}
+h3 {
+  margin: 0 0 .75em 0;
+  font-size: 3mm;
+}
+.sign {
+  text-align: right;
+}
+.skills ul {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.skills li {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.experiences table {
+  margin-bottom: 2em;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+.experiences table,
+.experiences th,
+.experiences td {
+  border: 1px solid #333;
+}
+.experiences table caption {
+  margin-bottom: .5em;
+  font-weight: bold;
+  text-align: left;
+}
+.experiences th,
+.experiences td {
+  padding: .5em;
+}
+.experiences th {
+  background-color: #DDD;
+}
+.experiences td {
+  vertical-align: top;
+  text-align: left;
+}
+.experiences td:nth-child(2) {
+  width: 72mm;
+  white-space: pre-wrap;
+}
+.tag {
+  margin: .25em;
+  padding: .1em .5em;
+  border-radius: .5em;
+  background-color: slategray;
+  font-weight: bold;
+  color: white;
+}
+@media print{
+  nav {
+    display: none;
+  }
+  main {
+    margin: 0;
+    padding: 0;
+  }
+}
+</style>
+</head>
+<body>
+<nav>
+  <fieldset>
+    <legend>Import File</legend>
+    <input type="file" accept=".json,.yaml,.yml">
+    <input type="text" placeholder="https://oshinko.github.io/resume-reader/resume.yaml">
+    <button>GET</button>
+  </fieldset>
+</nav>
+<main id="app">
+  <h1><span @click="title = window.prompt('Title')">{{ title || 'Profile' }}</span></h1>
+  <p class="sign" @click="sign = window.prompt('Free Text')">{{ sign || '氏名: 田中 太郎 (たなか たろう)' }}</p>
+  <article v-if="resume">
+    <p>{{ resume.introduction }}</p>
+    <section class="skills">
+      <h2>スキル</h2>
+      <ul>
+        <li v-for="fav in resume.favorites">
+          <div>{{ fav.name }}</div>
+          <div>経験年数</div>
+          <div>{{ fav.years }}</div>
+        </li>
+      </ul>
+    </section>
+    <section class="experiences">
+      <h2>職歴</h2>
+      <table v-for="exp in sortedExperiences">
+        <caption>{{ exp.title }} / 勤務形態: {{ exp.style }}</caption>
+        <tr>
+          <th>期間</th>
+          <th>担当業務に関しての詳しい内容・習得したスキル</th>
+          <th>使⽤したスキル・ツール</th>
+          <th>役職・役割 (チーム⼈数)</th>
+        </tr>
+        <tr>
+          <td>
+            {{ formatDate(exp.since, 'yyyy年MM月') }}
+            ～
+            {{ formatDate(exp.until, 'yyyy年MM月') }}
+          </td>
+          <td>{{ exp.text }}</td>
+          <td><div v-for="skill in exp.skills">{{ skill }}</div></td>
+          <td>
+            <ul>
+              <li v-for="pos in exp.positions">{{ pos }}</li>
+              <li>(チーム規模 {{ exp.scale }} 人)</li>
+            </ul>
+          </td>
+        </tr>
+      </table>
+    </section>
+  </article>
+</main>
+<script>
+var vue = new Vue({
+  el: '#app',
+  data: {
+    title: localStorage.getItem('title'),
+    sign: localStorage.getItem('sign'),
+    resume: jsyaml.load(localStorage.getItem('resume')),
+  },
+  watch: {
+    title(value, prev) {
+      localStorage.setItem('title', value);
+    },
+    resume(value, prev) {
+      localStorage.setItem('resume', jsyaml.dump(value));
+    }
+  },
+  computed: {
+    sortedExperiences() {
+      return this.resume.experiences.map(x => x)
+                        .sort((a, b) => a.since - b.since)
+                        .reverse();
+    }
+  }
+});
+function formatDate(date, format) {
+  return format.replace(/yyyy/g, date.getFullYear())
+               .replace(/MM/g, ('0' + (date.getMonth() + 1)).slice(-2))
+               .replace(/dd/g, ('0' + date.getDate()).slice(-2))
+               .replace(/HH/g, ('0' + date.getHours()).slice(-2))
+               .replace(/mm/g, ('0' + date.getMinutes()).slice(-2))
+               .replace(/ss/g, ('0' + date.getSeconds()).slice(-2))
+               .replace(/SSS/g, ('00' + date.getMilliseconds()).slice(-3));
+}
+function Resume(content) {
+  let resume = jsyaml.load(content);
+  resume.experiences.forEach(x => {
+    if (typeof x.since == 'string')
+      x.since = new Date(x.since);
+    if (typeof x.until == 'string')
+      x.until = new Date(x.until);
+  });
+  skills = resume.experiences.flatMap(x => x.skills.map(y => [y, x.until - x.since]))
+  resume.favorites = Array.from(new Set(skills.map(x => x[0])))
+                          .map(x => {return {
+                            name: x,
+                            years: skills.filter(y => y[0] == x).map(y => y[1]).reduce((a, b) => a + b) / 1000 / 3600 / 24 / 365
+                          }})
+                          .map(x => {return {
+                            name: x.name,
+                            years: Math.round(x.years)
+                          }})
+                          .filter(x => x.years >= 1);
+    return resume;
+}
+function importResumeByFile(event) {
+  let reader = new FileReader();
+  reader.onload = event => vue.resume = Resume(event.target.result);
+  reader.readAsText(event.target.files[0]);
+}
+function importResumeByURL(event) {
+  if (event.type == 'keyup' && event.keyCode != 13) return;
+  let input = event.type == 'click' ? event.target.previousElementSibling : event.target;
+  if (!input.value) return;
+  let req = new XMLHttpRequest();
+  req.onload = () => vue.resume = Resume(req.response);
+  req.onerror = () => console.error(req.statusText || 'Network error');
+  req.open('GET', input.value);
+  req.send();
+}
+document.querySelector('nav input[type="file"]').addEventListener('change', importResumeByFile);
+document.querySelector('nav input[type="text"]').addEventListener('keyup', importResumeByURL);
+document.querySelector('nav button').addEventListener('click', importResumeByURL);
+</script>
+</body>
+</html>
