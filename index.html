@@ -18,84 +18,90 @@ nav input[type="file"] {
 nav input[type="text"] {
   width: 32em;
 }
-main {
+#content {
   width: 210mm;
   padding: 2em;
 }
-main * {
+#content * {
   font-size: 2mm;
 }
-section {
+#content section {
   margin: 2em 0 3em 0;
 }
-table {
+#content table {
   width: 100%;
   page-break-inside: avoid;
 }
-ul {
+#content ul {
   list-style: none;
   margin: 0;
   padding: 0;
 }
-h1 {
+#content h1 {
   text-align: center;
   letter-spacing: .25em;
   font-size: 6mm;
 }
-h1 * {
+#content h1 * {
   font-size: 100%;
 }
-h2 {
+#content h2 {
   padding-bottom: .25em;
   border-bottom: 1px solid #333;
   font-size: 4mm;
 }
-h3 {
+#content h3 {
   margin: 0 0 .75em 0;
-  font-size: 3mm;
+  font-size: 2mm;
 }
-.sign {
+#content p {
+  font-size: 2mm;
+}
+#content .sign {
   text-align: right;
 }
-.skills ul {
+#content .skills ul {
   display: grid;
   grid-template-columns: 1fr 1fr;
 }
-.skills li {
+#content .skills li {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
 }
-.experiences table {
+#content .experiences table {
   margin-bottom: 2em;
   border-spacing: 0;
   border-collapse: collapse;
 }
-.experiences table,
-.experiences th,
-.experiences td {
+#content .experiences table,
+#content .experiences th,
+#content .experiences td {
   border: 1px solid #333;
 }
-.experiences table caption {
+#content .experiences table caption {
   margin-bottom: .5em;
   font-weight: bold;
   text-align: left;
 }
-.experiences th,
-.experiences td {
+#content .experiences th,
+#content .experiences td {
   padding: .5em;
 }
-.experiences th {
+#content .experiences th {
   background-color: #DDD;
 }
-.experiences td {
+#content .experiences td {
   vertical-align: top;
   text-align: left;
 }
-.experiences td:nth-child(2) {
+#content .experiences th:first-child {
+  width: 60mm;
+}
+#content .experiences td:nth-child(2) {
   width: 72mm;
   white-space: pre-wrap;
 }
-.tag {
+#content .tag {
   margin: .25em;
   padding: .1em .5em;
   border-radius: .5em;
@@ -107,7 +113,7 @@ h3 {
   nav {
     display: none;
   }
-  main {
+  #content {
     margin: 0;
     padding: 0;
   }
@@ -115,56 +121,63 @@ h3 {
 </style>
 </head>
 <body>
-<nav>
-  <fieldset>
-    <legend>Import File</legend>
-    <input type="file" accept=".json,.yaml,.yml">
-    <input type="text" placeholder="https://oshinko.github.io/resume-reader/resume.yaml">
-    <button>GET</button>
-  </fieldset>
-</nav>
 <main id="app">
-  <h1><span @click="title = window.prompt('Title')">{{ title || 'Profile' }}</span></h1>
-  <p class="sign" @click="sign = window.prompt('Free Text')">{{ sign || '氏名: 田中 太郎 (たなか たろう)' }}</p>
-  <article v-if="resume">
-    <p>{{ resume.introduction }}</p>
-    <section class="skills">
-      <h2>スキル</h2>
-      <ul>
-        <li v-for="fav in resume.favorites">
-          <div>{{ fav.name }}</div>
-          <div>経験年数</div>
-          <div>{{ fav.years }}</div>
-        </li>
-      </ul>
-    </section>
-    <section class="experiences">
-      <h2>職歴</h2>
-      <table v-for="exp in sortedExperiences">
-        <caption>{{ exp.title }} / 勤務形態: {{ exp.style }}</caption>
-        <tr>
-          <th>期間</th>
-          <th>担当業務に関しての詳しい内容・習得したスキル</th>
-          <th>使⽤したスキル・ツール</th>
-          <th>役職・役割 (チーム⼈数)</th>
-        </tr>
-        <tr>
-          <td>
-            {{ formatDate(exp.since, 'yyyy年MM月') }}
-            ～
-            {{ formatDate(exp.until, 'yyyy年MM月') }}
-          </td>
-          <td>{{ exp.text }}</td>
-          <td><div v-for="skill in exp.skills">{{ skill }}</div></td>
-          <td>
-            <ul>
-              <li v-for="pos in exp.positions">{{ pos }}</li>
-              <li>(チーム規模 {{ exp.scale }} 人)</li>
-            </ul>
-          </td>
-        </tr>
-      </table>
-    </section>
+  <nav>
+    <fieldset>
+      <legend>Import File</legend>
+      <input type="file" accept=".json,.yaml,.yml">
+      <input type="text" placeholder="https://oshinko.github.io/resume-reader/resume.yaml">
+      <button>GET</button>
+    </fieldset>
+    <fieldset>
+      <legend>Skill Threshold</legend>
+      <input v-model.number="skillThreshYears" type="number" placeholder="1"> years
+    </fieldset>
+  </nav>
+  <article id="content">
+    <h1><span @click="title = window.prompt('Title')">{{ title || 'Profile' }}</span></h1>
+    <p class="sign" @click="sign = window.prompt('Free Text')">{{ sign || '氏名: 田中 太郎 (たなか たろう)' }}</p>
+    <article v-if="resume">
+      <p>{{ resume.introduction }}</p>
+      <section class="skills">
+        <h2>スキル</h2>
+        <ul>
+          <li v-for="skill in skills">
+            <div>{{ skill.name }}</div>
+            <div>経験年数</div>
+            <div>{{ skill.years }}</div>
+          </li>
+        </ul>
+      </section>
+      <section class="experiences">
+        <h2>職歴</h2>
+        <table v-for="exp in sortedExperiences">
+          <caption>{{ exp.title }} / 勤務形態: {{ exp.style }}</caption>
+          <tr>
+            <th>期間</th>
+            <th>担当業務に関しての詳しい内容・習得したスキル</th>
+            <th>使⽤したスキル・ツール</th>
+            <th>役職・役割 (チーム⼈数)</th>
+          </tr>
+          <tr>
+            <td>
+              {{ formatDate(exp.since, 'yyyy年MM月') }}
+              ～
+              {{ formatDate(exp.until, 'yyyy年MM月dd日') }}
+              ({{ formatDateRange(exp.since, exp.until) }})
+            </td>
+            <td>{{ exp.text }}</td>
+            <td><div v-for="skill in exp.skills">{{ skill }}</div></td>
+            <td>
+              <ul>
+                <li v-for="pos in exp.positions">{{ pos }}</li>
+                <li>(チーム規模 {{ exp.scale }} 人)</li>
+              </ul>
+            </td>
+          </tr>
+        </table>
+      </section>
+    </article>
   </article>
 </main>
 <script>
@@ -174,13 +187,20 @@ var vue = new Vue({
     title: localStorage.getItem('title'),
     sign: localStorage.getItem('sign'),
     resume: jsyaml.load(localStorage.getItem('resume')),
+    skillThreshYears: localStorage.getItem('skillThreshYears') || 1
   },
   watch: {
     title(value, prev) {
       localStorage.setItem('title', value);
     },
+    sign(value, prev) {
+      localStorage.setItem('sign', value);
+    },
     resume(value, prev) {
       localStorage.setItem('resume', jsyaml.dump(value));
+    },
+    skillThreshYears(value, prev) {
+      localStorage.setItem('skillThreshYears', value);
     }
   },
   computed: {
@@ -188,6 +208,19 @@ var vue = new Vue({
       return this.resume.experiences.map(x => x)
                         .sort((a, b) => a.since - b.since)
                         .reverse();
+    },
+    skills() {
+      let skills = this.resume.experiences.flatMap(x => x.skills.map(y => [y, x.until - x.since]));
+      return Array.from(new Set(skills.map(x => x[0])))
+                  .map(x => {return {
+                    name: x,
+                    years: skills.filter(y => y[0] == x).map(y => y[1]).reduce((a, b) => a + b) / 1000 / 3600 / 24 / 365
+                  }})
+                  .filter(x => x.years >= this.skillThreshYears)
+                  .map(x => {return {
+                    name: x.name,
+                    years: Math.floor(x.years)
+                  }});
     }
   }
 });
@@ -200,6 +233,15 @@ function formatDate(date, format) {
                .replace(/ss/g, ('0' + date.getSeconds()).slice(-2))
                .replace(/SSS/g, ('00' + date.getMilliseconds()).slice(-3));
 }
+function formatDateRange(since, until) {
+  let y = (until - since) / 1000 / 3600 / 24 / 365;
+  let years = Math.floor(y);
+  let months = Math.round(12 * (y - years));
+  let parts = [];
+  if (years) parts.push(years + ' 年');
+  if (months) parts.push(months + ' ヶ月');
+  return parts.join(' ');
+}
 function Resume(content) {
   let resume = jsyaml.load(content);
   resume.experiences.forEach(x => {
@@ -208,18 +250,7 @@ function Resume(content) {
     if (typeof x.until == 'string')
       x.until = new Date(x.until);
   });
-  skills = resume.experiences.flatMap(x => x.skills.map(y => [y, x.until - x.since]))
-  resume.favorites = Array.from(new Set(skills.map(x => x[0])))
-                          .map(x => {return {
-                            name: x,
-                            years: skills.filter(y => y[0] == x).map(y => y[1]).reduce((a, b) => a + b) / 1000 / 3600 / 24 / 365
-                          }})
-                          .map(x => {return {
-                            name: x.name,
-                            years: Math.round(x.years)
-                          }})
-                          .filter(x => x.years >= 1);
-    return resume;
+  return resume;
 }
 function importResumeByFile(event) {
   let reader = new FileReader();
