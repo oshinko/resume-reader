@@ -133,6 +133,10 @@ nav input[type="text"] {
       <legend>Skill Threshold</legend>
       <input v-model.number="skillThreshYears" type="number" placeholder="1"> years
     </fieldset>
+    <fieldset>
+      <legend>Adjust Futures</legend>
+      <input v-model="adjustFutures" type="checkbox">
+    </fieldset>
   </nav>
   <article id="content">
     <h1><span @click="title = window.prompt('Title')">{{ title || 'Profile' }}</span></h1>
@@ -151,7 +155,7 @@ nav input[type="text"] {
       </section>
       <section class="experiences">
         <h2>職歴</h2>
-        <table v-for="exp in sortedExperiences">
+        <table v-for="exp in experiences">
           <caption>{{ exp.title }} / 勤務形態: {{ exp.style }}</caption>
           <tr>
             <th>期間</th>
@@ -187,7 +191,8 @@ var vue = new Vue({
     title: localStorage.getItem('title'),
     sign: localStorage.getItem('sign'),
     resume: jsyaml.load(localStorage.getItem('resume')),
-    skillThreshYears: localStorage.getItem('skillThreshYears') || 1
+    skillThreshYears: localStorage.getItem('skillThreshYears') || 1,
+    adjustFutures: localStorage.getItem('adjustFutures') || false
   },
   watch: {
     title(value, prev) {
@@ -201,12 +206,25 @@ var vue = new Vue({
     },
     skillThreshYears(value, prev) {
       localStorage.setItem('skillThreshYears', value);
+    },
+    adjustFutures(value, prev) {
+      localStorage.setItem('adjustFutures', value);
     }
   },
   computed: {
-    sortedExperiences() {
-      return this.resume.experiences.map(x => x)
+    experiences() {
+      let now = new Date();
+      return this.resume.experiences.map(exp => exp)
                         .sort((a, b) => a.since - b.since)
+                        .filter(exp => !this.adjustFutures || exp.since <= now)
+                        .map(exp => {
+                          let result = exp;
+                          if (this.adjustFutures && now < exp.until) {
+                            result = Object.assign({}, exp);
+                            result.until = now;
+                          }
+                          return result;
+                        })
                         .reverse();
     },
     skills() {
