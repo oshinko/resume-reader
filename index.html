@@ -2,6 +2,9 @@
 <head>
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-yaml@3.14.0/dist/js-yaml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+<script src="https://unpkg.com/vue-chartjs/dist/vue-chartjs.min.js"></script>
+<script src="components.js"></script>
 <style>
 * {
   font-family: "SF Pro JP", "SF Pro Text", "Apple TP", "Myriad Set Pro", system-ui, -apple-system, BlinkMacSystemFont,
@@ -26,7 +29,10 @@ nav input[type="text"] {
   font-size: 2mm;
 }
 #content section {
-  margin: 2em 0 3em 0;
+  margin: 2em 0 2em 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 #content table {
   width: 100%;
@@ -46,6 +52,7 @@ nav input[type="text"] {
   font-size: 100%;
 }
 #content h2 {
+  width: 100%;
   padding-bottom: .25em;
   border-bottom: 1px solid #333;
   font-size: 4mm;
@@ -62,6 +69,7 @@ nav input[type="text"] {
 }
 #content .skills ul {
   display: grid;
+  width: 100%;
   grid-template-columns: 1fr 1fr;
 }
 #content .skills li {
@@ -131,7 +139,11 @@ nav input[type="text"] {
     </fieldset>
     <fieldset>
       <legend>Skill Threshold</legend>
-      <input v-model.number="skillThreshYears" type="number" placeholder="1"> years
+      <input v-model.number="skillThreshYears" type="number" placeholder="1"> years or more
+    </fieldset>
+    <fieldset>
+      <legend>Skill Chart Threshold</legend>
+      <input v-model.number="skillChartThreshYears" type="number" placeholder="1"> years or less
     </fieldset>
     <fieldset>
       <legend>Adjust Futures</legend>
@@ -152,6 +164,10 @@ nav input[type="text"] {
             <div>{{ skill.years }}</div>
           </li>
         </ul>
+        <radar-chart
+          :labels="skills.map(x => x.name)"
+          label-size="10"
+          :chart-data="[{ data: skills.map(x => Math.min(x.years, skillChartThreshYears)) }]" />
       </section>
       <section class="experiences">
         <h2>職歴</h2>
@@ -187,11 +203,15 @@ nav input[type="text"] {
 <script>
 var vue = new Vue({
   el: '#app',
+  components: {
+    RadarChart
+  },
   data: {
     title: localStorage.getItem('title'),
     sign: localStorage.getItem('sign'),
     resume: jsyaml.load(localStorage.getItem('resume')),
     skillThreshYears: localStorage.getItem('skillThreshYears') || 1,
+    skillChartThreshYears: localStorage.getItem('skillChartThreshYears') || 1,
     adjustFutures: localStorage.getItem('adjustFutures') || false
   },
   watch: {
@@ -206,6 +226,9 @@ var vue = new Vue({
     },
     skillThreshYears(value, prev) {
       localStorage.setItem('skillThreshYears', value);
+    },
+    skillChartThreshYears(value, prev) {
+      localStorage.setItem('skillChartThreshYears', value);
     },
     adjustFutures(value, prev) {
       localStorage.setItem('adjustFutures', value);
