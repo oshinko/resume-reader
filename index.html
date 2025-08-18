@@ -3,7 +3,7 @@
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-yaml@3.14.0/dist/js-yaml.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
-<script src="https://unpkg.com/vue-chartjs/dist/vue-chartjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue-chartjs@3.5.1/dist/vue-chartjs.min.js"></script>
 <script src="components.js"></script>
 <style>
 * {
@@ -171,7 +171,7 @@ nav input[type="text"] {
       </section>
       <section class="experiences">
         <h2>職歴</h2>
-        <table v-for="exp in experiences">
+        <table v-for="exp in experiences.reverse()">
           <caption>{{ exp.title }} / 勤務形態: {{ exp.style }}</caption>
           <tr>
             <th>期間</th>
@@ -242,16 +242,15 @@ var vue = new Vue({
                         .filter(exp => !this.adjustFutures || exp.since <= now)
                         .map(exp => {
                           let result = exp;
-                          if (this.adjustFutures && now < exp.until) {
+                          if (!exp.until || this.adjustFutures && now < exp.until) {
                             result = Object.assign({}, exp);
                             result.until = now;
                           }
                           return result;
-                        })
-                        .reverse();
+                        });
     },
     skills() {
-      let skills = this.resume.experiences.flatMap(x => x.skills.map(y => [y, x.until - x.since]));
+      let skills = this.experiences.flatMap(x => x.skills.map(y => [y, x.until - x.since]));
       return Array.from(new Set(skills.map(x => x[0])))
                   .map(x => {return {
                     name: x,
