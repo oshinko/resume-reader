@@ -22,7 +22,7 @@ nav input[type="text"] {
   width: 32em;
 }
 #content {
-  width: 210mm;
+  width: 206mm;
   padding: 2em;
 }
 #content * {
@@ -122,7 +122,7 @@ nav input[type="text"] {
     display: none;
   }
   #content {
-    margin: 0;
+    margin: 0 auto;
     padding: 0;
   }
 }
@@ -138,12 +138,20 @@ nav input[type="text"] {
       <button>GET</button>
     </fieldset>
     <fieldset>
+      <legend>Disable Chart</legend>
+      <input v-model="disableChart" type="checkbox">
+    </fieldset>
+    <fieldset v-if="!disableChart">
       <legend>Skill Threshold</legend>
       <input v-model.number="skillThreshYears" type="number" placeholder="1"> years or more
     </fieldset>
-    <fieldset>
+    <fieldset v-if="!disableChart">
       <legend>Skill Chart Threshold</legend>
       <input v-model.number="skillChartThreshYears" type="number" placeholder="1"> years or less
+    </fieldset>
+    <fieldset v-if="!disableChart">
+      <legend>Skill Whitelist</legend>
+      <input v-model.number="skillWhitelist" type="text" placeholder="python, java, typescript">
     </fieldset>
     <fieldset>
       <legend>Adjust Futures</legend>
@@ -165,13 +173,14 @@ nav input[type="text"] {
           </li>
         </ul>
         <radar-chart
+          v-if="!disableChart"
           :labels="skills.map(x => x.name)"
           label-size="10"
           :chart-data="[{ data: skills.map(x => Math.min(x.years, skillChartThreshYears)) }]" />
       </section>
       <section class="experiences">
         <h2>職歴</h2>
-        <table v-for="exp in experiences.reverse()">
+        <table v-for="exp in reversedExperiences">
           <caption>{{ exp.title }} / 勤務形態: {{ exp.style }}</caption>
           <tr>
             <th>期間</th>
@@ -210,8 +219,10 @@ var vue = new Vue({
     title: localStorage.getItem('title'),
     sign: localStorage.getItem('sign'),
     resume: jsyaml.load(localStorage.getItem('resume')),
+    disableChart: localStorage.getItem('disableChart') || false,
     skillThreshYears: localStorage.getItem('skillThreshYears') || 1,
     skillChartThreshYears: localStorage.getItem('skillChartThreshYears') || 1,
+    skillWhitelist: localStorage.getItem('skillWhitelist') || '',
     adjustFutures: localStorage.getItem('adjustFutures') || false
   },
   watch: {
@@ -224,11 +235,17 @@ var vue = new Vue({
     resume(value, prev) {
       localStorage.setItem('resume', jsyaml.dump(value));
     },
+    disableChart(value, prev) {
+      localStorage.setItem('disableChart', value);
+    },
     skillThreshYears(value, prev) {
       localStorage.setItem('skillThreshYears', value);
     },
     skillChartThreshYears(value, prev) {
       localStorage.setItem('skillChartThreshYears', value);
+    },
+    skillWhitelist(value, prev) {
+      localStorage.setItem('skillWhitelist', value);
     },
     adjustFutures(value, prev) {
       localStorage.setItem('adjustFutures', value);
@@ -249,6 +266,12 @@ var vue = new Vue({
                           return result;
                         });
     },
+    reversedExperiences() {
+      return this.experiences.reverse();
+    },
+    _skillWhitelist() {
+      return this.skillWhitelist.split(/, */).filter(x => x).map(x => x.toLowerCase())
+    },
     skills() {
       let skills = this.experiences.flatMap(x => x.skills.map(y => [y, x.until - x.since]));
       return Array.from(new Set(skills.map(x => x[0])))
@@ -256,7 +279,7 @@ var vue = new Vue({
                     name: x,
                     years: skills.filter(y => y[0] == x).map(y => y[1]).reduce((a, b) => a + b) / 1000 / 3600 / 24 / 365
                   }})
-                  .filter(x => x.years >= this.skillThreshYears)
+                  .filter(x => x.years >= this.skillThreshYears && (this._skillWhitelist.length === 0 || this._skillWhitelist.find(y => x.name.toLowerCase().startsWith(y))))
                   .map(x => {return {
                     name: x.name,
                     years: Math.floor(x.years)
