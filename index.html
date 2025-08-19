@@ -141,7 +141,7 @@ nav input[type="text"] {
       <legend>Disable Chart</legend>
       <input v-model="disableChart" type="checkbox">
     </fieldset>
-    <fieldset v-if="!disableChart">
+    <fieldset>
       <legend>Skill Threshold</legend>
       <input v-model.number="skillThreshYears" type="number" placeholder="1"> years or more
     </fieldset>
@@ -149,7 +149,7 @@ nav input[type="text"] {
       <legend>Skill Chart Threshold</legend>
       <input v-model.number="skillChartThreshYears" type="number" placeholder="1"> years or less
     </fieldset>
-    <fieldset v-if="!disableChart">
+    <fieldset>
       <legend>Skill Whitelist</legend>
       <input v-model.number="skillWhitelist" type="text" placeholder="python, java, typescript">
     </fieldset>
@@ -282,7 +282,7 @@ var vue = new Vue({
                   .filter(x => x.years >= this.skillThreshYears && (this._skillWhitelist.length === 0 || this._skillWhitelist.find(y => x.name.toLowerCase().startsWith(y))))
                   .map(x => {return {
                     name: x.name,
-                    years: Math.floor(x.years)
+                    years: Math.round(x.years)
                   }});
     }
   }
